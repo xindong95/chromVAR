@@ -35,13 +35,13 @@ getPeaks <- function(filename, extra_cols = c(), sort_peaks = FALSE) {
   bed <- makeGRangesFromDataFrame(bed, keep.extra.columns = TRUE)
   if (!isDisjoint(bed)) {
     warning("Peaks are overlapping!",
-      "After getting peak counts, peaks can be reduced to non-overlapping set",
-      " using filterPeaks function")
+            "After getting peak counts, peaks can be reduced to non-overlapping set",
+            " using filterPeaks function")
   }
   if (sum(width(bed) == width(bed[1])) != length(bed)) {
     warning("Peaks are not equal width!",
-      "Use resize(peaks, width = x, fix = \"center\") to make peaks equal in ",
-      "size, where x is the desired size of the peaks)")
+            "Use resize(peaks, width = x, fix = \"center\") to make peaks equal in ",
+            "size, where x is the desired size of the peaks)")
   }
   #sorted_bed <- sortSeqlevels(bed)
   #sorted_bed <- sort(sorted_bed, ignore.strand = TRUE)
@@ -71,8 +71,8 @@ getPeaks <- function(filename, extra_cols = c(), sort_peaks = FALSE) {
 #' @return \code{\link[GenomicRanges]{GRanges-class}}
 #' @export
 readNarrowpeaks <- function(filename, 
-                                   width = 500, 
-                                   non_overlapping = TRUE) {
+                            width = 500, 
+                            non_overlapping = TRUE) {
   cn <- c("chr", "start", "end", "name", "score", "strand", "fc", 
           "pval", "qval", "summit")
   if (is.installed("readr")) {
@@ -132,9 +132,9 @@ readNarrowpeaks <- function(filename,
 #' fragment_counts <- counts(mini_counts)
 setMethod("counts", signature(object = "SummarizedExperiment"), 
           function(object) {
-  stopifnot("counts" %in% assayNames(object))
-  assays(object)$counts
-})
+            stopifnot("counts" %in% assayNames(object))
+            assays(object)$counts
+          })
 
 
 #' @rdname counts
@@ -196,7 +196,7 @@ setReplaceMethod("counts", signature(object = "SummarizedExperiment",
 #'                            paired = FALSE, 
 #'                            format = "bed")                           
 getCounts <- function(alignment_files, peaks, paired, by_rg = FALSE, 
-                       format = c("bam", "bed"), colData = NULL) {
+                      format = c("bam", "bed"), colData = NULL) {
   
   format <- match.arg(format)
   if (format == "bam") {
@@ -299,7 +299,7 @@ readAlignmentFromBed <- function(filename, paired) {
     colnames(tmp) <- c("chr", "start", "end", "strand")
     tmp[, "start"] <- tmp[, "start"] + 1
     tmp <- GRanges(tmp$chr, ranges = IRanges(tmp$start, tmp$end), 
-                             strand = tmp$strand)
+                   strand = tmp$strand)
   } else {
     tmp <- tmp[, 1:6]
     colnames(tmp) <- c("chr", "start", "end")
@@ -339,11 +339,11 @@ bamToFragmentsByRG <- function(bamfile, paired) {
                          flag = scanBamFlag(isMinusStrand = FALSE, 
                                             isProperPair = TRUE),
                          what = c("rname", "pos", "isize"),
-                         tag = "RG"))[[1]]
-    RG_tags <- mxsort(unique(scanned$tag$RG))
+                         tag = "CB"))[[1]]
+    RG_tags <- mxsort(unique(scanned$tag$CB))
     
-    out <- bplapply(RG_tags, function(RG) {
-      match_RG <- which(scanned$tag$RG == RG)
+    out <- bplapply(RG_tags, function(CB) {
+      match_RG <- which(scanned$tag$CB == CB)
       scanned_left <- GRanges(seqnames = scanned$rname[match_RG], 
                               IRanges(start = scanned$pos[match_RG], 
                                       width = 1), strand = "+")
@@ -357,11 +357,11 @@ bamToFragmentsByRG <- function(bamfile, paired) {
     scanned <- scanBam(bamfile,
                        param = ScanBamParam(what = c("rname", 
                                                      "pos", "strand", "qwidth"),
-                                            tag = "RG"))[[1]]
-    RG_tags <- mxsort(unique(scanned$tag$RG))
+                                            tag = "CB"))[[1]]
+    RG_tags <- mxsort(unique(scanned$tag$CB))
     
-    out <- bplapply(RG_tags, function(RG) {
-      match_RG <- which(scanned$tag$RG == RG)
+    out <- bplapply(RG_tags, function(CB) {
+      match_RG <- which(scanned$tag$CB == CB)
       return(GRanges(seqnames = scanned$rname[match_RG], 
                      IRanges(start = ifelse(scanned$strand[match_RG] ==  "-", 
                                             scanned$pos[match_RG] + 
@@ -465,9 +465,9 @@ getFragmentCountsByRG <- function(bam, peaks, paired) {
 #'                            paired = TRUE) 
 #'                            
 getSampleDepths <- function(alignment_files, 
-                              paired = TRUE, 
-                              by_rg = FALSE, 
-                              format = c("bam", "bed")) {
+                            paired = TRUE, 
+                            by_rg = FALSE, 
+                            format = c("bam", "bed")) {
   format <- match.arg(format)
   if (format == "bam") {
     return(get_sample_depths_from_bams(alignment_files, paired, by_rg))
